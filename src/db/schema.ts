@@ -6,8 +6,11 @@ import {
   timestamp,
   integer,
   text,
+  numeric,
+  date,
+  check,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 
 export const customers = pgTable("customers", {
   id: serial("id").primaryKey(),
@@ -56,3 +59,93 @@ export const ticketsRelations = relations(tickets, ({ one }) => ({
     references: [customers.id],
   }),
 }));
+
+// ROOMS TABLE
+export const rooms = pgTable(
+  "rooms",
+  {
+    id: serial("room_id").primaryKey(),
+    roomNumber: varchar("room_number", { length: 10 }).unique().notNull(),
+    roomType: varchar("room_type", { length: 20 }).notNull(),
+    bedType: varchar("bed_type", { length: 20 }).notNull(), // e.g., 'Single', 'Double', 'Queen', 'King'
+    maxOccupants: integer("max_occupants"), // e.g., 2, 4
+    maxChildren: integer("max_children"), // e.g., 2, 4
+    status: varchar("status", { length: 20 }).notNull(),
+    ratePerNight: numeric("rate_per_night", { precision: 10, scale: 2 }),
+    ratePerWeek: numeric("rate_per_week", { precision: 10, scale: 2 }),
+    ratePerMonth: numeric("rate_per_month", { precision: 10, scale: 2 }),
+  },
+  (rooms) => [
+    check("room_type_check", sql`${rooms.roomType} IN ('Standard', 'Suite')`),
+    check(
+      "room_status_check",
+      sql`${rooms.status} IN ('Available', 'Occupied', 'Maintenance')`
+    ),
+  ]
+);
+
+// RESERVATIONS TABLE
+export const reservations = pgTable(
+  "reservations",
+  {
+    id: serial("reservation_id").primaryKey(),
+
+    // Use varchar instead of email type unless custom email type is defined
+    customerEmail: varchar("customer_email", { length: 100 }).notNull(),
+
+    numAdults: integer("num_adults").default(1),
+    numChildren: integer("num_children").default(0),
+
+    checkInDate: timestamp("check_in_date").notNull(),
+    checkOutDate: timestamp("check_out_date").notNull(),
+
+    status: varchar("status", { length: 20 }).notNull(),
+    createdBy: varchar("created_by", { length: 20 }).notNull(),
+
+    createdAt: timestamp("created_at").defaultNow(),
+  },
+  (reservations) => ({
+    statusCheck: check(
+      "reservation_status_check",
+      sql`${reservations.status} IN ('Active', 'Cancelled', 'Completed', 'No-show')`
+    ),
+    createdByCheck: check(
+      "created_by_check",
+      sql`${reservations.createdBy} IN ('Customer', 'Clerk')`
+    ),
+  })
+);
+
+// RESERVATION ROOMS TABLE
+export const reservationRooms = pgTable("reservation_rooms", {
+  id: serial("id").primaryKey(),
+  reservationId: integer("reservation_id")
+    .notNull()
+    .references(() => reservations.id),
+  roomId: integer("room_id")
+    .notNull()
+    .references(() => rooms.id),
+  assignedDate: date("assigned_date"),
+  checkInTime: timestamp("check_in_time"),
+  checkOutTime: timestamp("check_out_time"),
+});
+
+// ROOM RELATIONS
+export const roomsRelations = relations(rooms, ({ many }) => ({
+  reservationRooms: many(reservationRooms),
+}));
+
+// RESERVATION ROOMS RELATIONS
+export const reservationRoomsRelations = relations(
+  reservationRooms,
+  ({ one }) => ({
+    reservation: one(reservations, {
+      fields: [reservationRooms.reservationId],
+      references: [reservations.id],
+    }),
+    room: one(rooms, {
+      fields: [reservationRooms.roomId],
+      references: [rooms.id],
+    }),
+  })
+);

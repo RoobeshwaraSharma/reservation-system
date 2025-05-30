@@ -1,4 +1,7 @@
-import { LoginLink } from "@kinde-oss/kinde-auth-nextjs/components";
+import {
+  LoginLink,
+  RegisterLink,
+} from "@kinde-oss/kinde-auth-nextjs/components";
 
 import { Button } from "@/components/ui/button";
 
@@ -8,6 +11,9 @@ export default function LoginPage() {
       <h1>Repair Shop</h1>
       <Button asChild>
         <LoginLink>Sign In</LoginLink>
+      </Button>
+      <Button asChild>
+        <RegisterLink postLoginRedirectURL="/customers">Sign up</RegisterLink>
       </Button>
     </main>
   );

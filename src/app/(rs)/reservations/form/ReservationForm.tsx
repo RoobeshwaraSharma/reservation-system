@@ -1,0 +1,206 @@
+"use client";
+
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Form } from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+
+import { InputWithLabel } from "@/components/inputs/InputWithLabel";
+import { SelectWithLabel } from "@/components/inputs/SelectWithLabel";
+import { DisplayServerActionResponse } from "@/components/DisplayServerActionResponse";
+
+import {
+  insertReservationSchema,
+  type insertReservationSchemaType,
+  reservationStatusEnum,
+  createdByEnum,
+} from "@/zod-schemas/reservation";
+
+import { useAction } from "next-safe-action/hooks";
+import { saveReservationAction } from "@/app/actions/saveReservationAction";
+import { toast } from "sonner";
+import { LoaderCircle } from "lucide-react";
+import { z } from "zod";
+
+type Props = {
+  reservation?: {
+    id: number;
+    customerEmail: string;
+    numAdults: number | null;
+    numChildren: number | null;
+    checkInDate: Date;
+    checkOutDate: Date;
+    status: string;
+    createdBy: string;
+    createdAt: Date | null;
+  };
+  isEditable?: boolean;
+  customerEmail?: string | null;
+};
+
+const statusOptions = [
+  { id: "Active", description: "Active" },
+  { id: "Cancelled", description: "Cancelled" },
+  { id: "Completed", description: "Completed" },
+  { id: "No-show", description: "No-show" },
+];
+
+const createdByOptions = [
+  { id: "Customer", description: "Customer" },
+  { id: "Clerk", description: "Clerk" },
+];
+
+// Infer enum types
+type ReservationStatus = z.infer<typeof reservationStatusEnum>;
+type CreatedBy = z.infer<typeof createdByEnum>;
+
+export default function ReservationForm({
+  reservation,
+  isEditable = true,
+  customerEmail,
+}: Props) {
+  const today = new Date();
+  const tomorrow = new Date();
+  tomorrow.setDate(today.getDate() + 1);
+
+  const defaultValues: insertReservationSchemaType = {
+    id: reservation?.id ?? "(New)",
+    customerEmail: reservation?.customerEmail ?? customerEmail ?? "",
+    numAdults: reservation?.numAdults ?? 1,
+    numChildren: reservation?.numChildren ?? 0,
+    checkInDate: reservation?.checkInDate ?? today,
+    checkOutDate: reservation?.checkOutDate ?? tomorrow,
+    status: (reservation?.status as ReservationStatus) ?? "Active",
+    createdBy: (reservation?.createdBy as CreatedBy) ?? "Customer",
+  };
+
+  const form = useForm<insertReservationSchemaType>({
+    mode: "onBlur",
+    resolver: zodResolver(insertReservationSchema),
+    defaultValues,
+  });
+
+  const {
+    execute: executeSave,
+    result: saveResult,
+    isPending: isSaving,
+    reset: resetSaveAction,
+  } = useAction(saveReservationAction, {
+    onSuccess({ data }) {
+      if (data?.message) {
+        toast("Success! 🎉");
+      }
+    },
+    onError({ error }) {
+      toast(`Save Failed. Error: ${error}`);
+    },
+  });
+
+  async function submitForm(data: insertReservationSchemaType) {
+    executeSave(data);
+  }
+
+  return (
+    <div className="flex flex-col gap-1 sm:px-8">
+      <DisplayServerActionResponse result={saveResult} />
+      <div>
+        <h2 className="text-2xl font-bold">
+          {reservation?.id && isEditable
+            ? `Edit Reservation #${reservation.id}`
+            : reservation?.id
+            ? `View Reservation #${reservation.id}`
+            : "New Reservation Form"}
+        </h2>
+      </div>
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(submitForm)}
+          className="flex flex-col md:flex-row gap-4 md:gap-8"
+        >
+          <div className="flex flex-col gap-4 w-full max-w-xs">
+            <InputWithLabel<insertReservationSchemaType>
+              fieldTitle="Customer Email"
+              nameInSchema="customerEmail"
+              disabled
+            />
+
+            <InputWithLabel<insertReservationSchemaType>
+              fieldTitle="Number of Adults"
+              nameInSchema="numAdults"
+              type="number"
+              disabled={!isEditable}
+            />
+
+            <InputWithLabel<insertReservationSchemaType>
+              fieldTitle="Number of Children"
+              nameInSchema="numChildren"
+              type="number"
+              disabled={!isEditable}
+            />
+
+            <InputWithLabel<insertReservationSchemaType>
+              fieldTitle="Check-in Date"
+              nameInSchema="checkInDate"
+              type="date"
+              disabled={!isEditable}
+            />
+
+            <InputWithLabel<insertReservationSchemaType>
+              fieldTitle="Check-out Date"
+              nameInSchema="checkOutDate"
+              type="date"
+              disabled={!isEditable}
+            />
+          </div>
+          <div className="flex flex-col gap-4 w-full max-w-xs">
+            <SelectWithLabel<insertReservationSchemaType>
+              fieldTitle="Status"
+              nameInSchema="status"
+              data={statusOptions}
+              disabled={!isEditable}
+            />
+
+            <SelectWithLabel<insertReservationSchemaType>
+              fieldTitle="Created By"
+              nameInSchema="createdBy"
+              data={createdByOptions}
+              disabled={!isEditable}
+            />
+
+            {isEditable ? (
+              <div className="flex gap-2 mt-4">
+                <Button
+                  type="submit"
+                  className="w-3/4"
+                  variant="default"
+                  title="Save"
+                  disabled={isSaving}
+                >
+                  {isSaving ? (
+                    <>
+                      <LoaderCircle className="animate-spin" /> Saving
+                    </>
+                  ) : (
+                    "Save"
+                  )}
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="destructive"
+                  title="Reset"
+                  onClick={() => {
+                    form.reset(defaultValues);
+                    resetSaveAction();
+                  }}
+                >
+                  Reset
+                </Button>
+              </div>
+            ) : null}
+          </div>
+        </form>
+      </Form>
+    </div>
+  );
+}

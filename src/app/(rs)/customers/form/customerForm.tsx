@@ -85,11 +85,11 @@ export default function CustomerForm({ customer, isManager = false }: Props) {
   } = useAction(saveCustomerAction, {
     onSuccess({ data }) {
       if (data?.message) {
-        toast("Success! 🎉");
+        toast.success("Success! 🎉");
       }
     },
     onError({ error }) {
-      toast(`Save Failed. Error: ${error}`);
+      toast.error(`Save Failed. Error: ${error}`);
     },
   });
 

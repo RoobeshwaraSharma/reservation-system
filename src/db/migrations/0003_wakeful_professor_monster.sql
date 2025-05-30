@@ -1,0 +1,1 @@
+ALTER TABLE "reservations" ALTER COLUMN "num_adults" SET DEFAULT 1;

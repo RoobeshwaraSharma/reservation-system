@@ -21,10 +21,11 @@ export default async function CustomerFormPage({
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
   try {
-    const { getPermission } = getKindeServerSession();
+    const { getPermission, getUser } = getKindeServerSession();
     const managerPermission = await getPermission("manager");
     const isManager = managerPermission?.isGranted;
-
+    const user = await getUser();
+    console.log(user);
     // customers/form/
     const { customerId } = await searchParams;
     //Edit customer form
