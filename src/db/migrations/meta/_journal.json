@@ -43,6 +43,27 @@
       "when": 1748537623765,
       "tag": "0005_clever_sasquatch",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1748620336571,
+      "tag": "0006_sleepy_red_shift",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1748620568560,
+      "tag": "0007_grey_firedrake",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1748620735152,
+      "tag": "0008_faithful_skrulls",
+      "breakpoints": true
     }
   ]
 }

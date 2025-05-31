@@ -21,11 +21,14 @@ import { saveReservationAction } from "@/app/actions/saveReservationAction";
 import { toast } from "sonner";
 import { LoaderCircle } from "lucide-react";
 import { z } from "zod";
+import { KindeUser } from "@kinde-oss/kinde-auth-nextjs/types";
 
 type Props = {
   reservation?: {
     id: number;
     customerEmail: string;
+    firstName: string;
+    lastName: string;
     numAdults: number | null;
     numChildren: number | null;
     checkInDate: Date;
@@ -35,7 +38,8 @@ type Props = {
     createdAt: Date | null;
   };
   isEditable?: boolean;
-  customerEmail?: string | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  user?: KindeUser<Record<string, any>>;
 };
 
 const statusOptions = [
@@ -57,7 +61,7 @@ type CreatedBy = z.infer<typeof createdByEnum>;
 export default function ReservationForm({
   reservation,
   isEditable = true,
-  customerEmail,
+  user,
 }: Props) {
   const today = new Date();
   const tomorrow = new Date();
@@ -65,7 +69,9 @@ export default function ReservationForm({
 
   const defaultValues: insertReservationSchemaType = {
     id: reservation?.id ?? "(New)",
-    customerEmail: reservation?.customerEmail ?? customerEmail ?? "",
+    customerEmail: reservation?.customerEmail ?? user?.email ?? "",
+    firstName: reservation?.firstName ?? user?.given_name ?? "",
+    lastName: reservation?.lastName ?? user?.family_name ?? "",
     numAdults: reservation?.numAdults ?? 1,
     numChildren: reservation?.numChildren ?? 0,
     checkInDate: reservation?.checkInDate ?? today,
@@ -118,8 +124,21 @@ export default function ReservationForm({
           className="flex flex-col md:flex-row gap-4 md:gap-8"
         >
           <div className="flex flex-col gap-4 w-full max-w-xs">
+            <div className="flex gap-2">
+              <InputWithLabel<insertReservationSchemaType>
+                fieldTitle="First Name"
+                nameInSchema="firstName"
+                disabled
+              />
+              <InputWithLabel<insertReservationSchemaType>
+                fieldTitle="Last Name"
+                nameInSchema="lastName"
+                disabled
+              />
+            </div>
+
             <InputWithLabel<insertReservationSchemaType>
-              fieldTitle="Customer Email"
+              fieldTitle="Email"
               nameInSchema="customerEmail"
               disabled
             />

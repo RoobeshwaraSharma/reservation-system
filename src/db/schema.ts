@@ -90,8 +90,9 @@ export const reservations = pgTable(
   {
     id: serial("reservation_id").primaryKey(),
 
-    // Use varchar instead of email type unless custom email type is defined
     customerEmail: varchar("customer_email", { length: 100 }).notNull(),
+    firstName: varchar("first_name", { length: 100 }).notNull(),
+    lastName: varchar("last_name", { length: 100 }).notNull(),
 
     numAdults: integer("num_adults").default(1),
     numChildren: integer("num_children").default(0),
@@ -104,16 +105,13 @@ export const reservations = pgTable(
 
     createdAt: timestamp("created_at").defaultNow(),
   },
-  (reservations) => ({
-    statusCheck: check(
+  (table) => [
+    check(
       "reservation_status_check",
-      sql`${reservations.status} IN ('Active', 'Cancelled', 'Completed', 'No-show')`
+      sql`${table.status} IN ('Active', 'Cancelled', 'Completed', 'No-show')`
     ),
-    createdByCheck: check(
-      "created_by_check",
-      sql`${reservations.createdBy} IN ('Customer', 'Clerk')`
-    ),
-  })
+    check("created_by_check", sql`${table.createdBy} IN ('Customer', 'Clerk')`),
+  ]
 );
 
 // RESERVATION ROOMS TABLE

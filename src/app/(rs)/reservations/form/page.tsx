@@ -28,11 +28,11 @@ export default async function ReservationFormPage({
 }) {
   const { reservationId } = await searchParams;
   const { getUser } = getKindeServerSession();
+  const user = await getUser();
 
-  const customerEmail = (await getUser()).email;
   // New reservation
   if (!reservationId) {
-    return <ReservationForm isEditable={true} customerEmail={customerEmail} />;
+    return <ReservationForm isEditable={true} user={user} />;
   }
 
   // Edit reservation

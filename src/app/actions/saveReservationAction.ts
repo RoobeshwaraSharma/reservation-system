@@ -37,6 +37,8 @@ export const saveReservationAction = actionClient
           .insert(reservations)
           .values({
             customerEmail: reservation.customerEmail.toLowerCase(),
+            firstName: reservation.firstName,
+            lastName: reservation.lastName,
             numAdults: reservation.numAdults,
             numChildren: reservation.numChildren,
             checkInDate: reservation.checkInDate,

@@ -19,6 +19,9 @@ const baseInsertReservationSchema = createInsertSchema(reservations, {
       .min(1, "Email is required")
       .email("Invalid email address"),
 
+  firstName: (schema) => schema.firstName.min(1, "First name is required"),
+  lastName: (schema) => schema.lastName.min(1, "Last name is required"),
+
   numAdults: () => z.coerce.number().min(0).default(1),
   numChildren: () => z.coerce.number().min(0).default(0),
   checkInDate: () =>
