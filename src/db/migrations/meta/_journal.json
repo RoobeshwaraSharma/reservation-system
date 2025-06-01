@@ -64,6 +64,13 @@
       "when": 1748620735152,
       "tag": "0008_faithful_skrulls",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1748750395621,
+      "tag": "0009_worthless_ikaris",
+      "breakpoints": true
     }
   ]
 }

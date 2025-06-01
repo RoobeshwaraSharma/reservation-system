@@ -137,12 +137,17 @@ export default function ReservationTable({ data }: Props) {
         ),
         cell: ({ getValue }) => {
           const value = getValue();
-          if (columnName === "status" && value instanceof String) {
+          if (columnName === "status" && typeof value === "string") {
             return (
               <div className="grid place-content-center font-medium">
                 {value === "Active" && (
                   <div className="text-green-600 flex items-center gap-1">
                     <CircleCheckIcon className="w-4 h-4" /> Confirmed
+                  </div>
+                )}
+                {value === "Inprogress" && (
+                  <div className="text-pink-500 flex items-center gap-1">
+                    <CircleCheckIcon className="w-4 h-4" /> CheckedIn
                   </div>
                 )}
                 {value === "Cancelled" && (
@@ -155,8 +160,10 @@ export default function ReservationTable({ data }: Props) {
                     <CircleXIcon className="w-4 h-4" /> Cancelled
                   </div>
                 )}
-                {value !== "Active" && value !== "Cancelled" && (
-                  <div className="opacity-70">{value}</div>
+                {value === "No-show" && (
+                  <div className="text-yellow-500 flex items-center gap-1">
+                    <CircleXIcon className="w-4 h-4" /> No-show
+                  </div>
                 )}
               </div>
             );

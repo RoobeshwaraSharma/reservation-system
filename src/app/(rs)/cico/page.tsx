@@ -1,47 +1,40 @@
-import { getReservationByEmail } from "@/lib/quaries/getReservationByEmail";
-import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import ReservationSearch from "./ReservationRoomSearch";
-import ReservationTable from "./ReservationRoomTable";
-import { getReservationSearchResults } from "@/lib/quaries/getReservationSearchResult";
+import { getReservationCicoSearchResult } from "@/lib/quaries/getReservationCicoSearchResult";
+import { getReservations } from "@/lib/quaries/getReservations";
+import ReservationCicoSearch from "./ReservationRoomSearch";
+import ReservationCicoTable from "./ReservationRoomTable";
 
 export const metadata = {
   title: "Reservation Room Search",
 };
 
-export default async function Tickets({
+export default async function ReservationCico({
   searchParams,
 }: {
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
   const { searchText } = await searchParams;
-  const { getUser } = getKindeServerSession();
 
-  const customerEmail = (await getUser()).email;
-
-  if (!searchText && customerEmail) {
-    const results = await getReservationByEmail(customerEmail);
+  if (!searchText) {
+    const results = await getReservations();
     return (
       <>
-        <ReservationSearch />
+        <ReservationCicoSearch />
         {results.length ? (
-          <ReservationTable data={results} />
+          <ReservationCicoTable data={results} />
         ) : (
-          <p className="mt-4">No open tickets found</p>
+          <p className="mt-4">No Reservations found</p>
         )}
       </>
     );
   }
 
-  const results = await getReservationSearchResults(
-    searchText ?? "",
-    customerEmail ?? ""
-  );
+  const results = await getReservationCicoSearchResult(searchText ?? "");
 
   return (
     <>
-      <ReservationSearch />
+      <ReservationCicoSearch />
       {results.length ? (
-        <ReservationTable data={results} />
+        <ReservationCicoTable data={results} />
       ) : (
         <p className="mt-4">No results found</p>
       )}

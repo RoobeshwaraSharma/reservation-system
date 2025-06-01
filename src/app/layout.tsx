@@ -44,7 +44,7 @@ export default function RootLayout({
           {children}
           <Analytics />
         </ThemeProvider>
-        <Toaster />
+        <Toaster richColors position="top-right" duration={5000} />
       </body>
     </html>
   );

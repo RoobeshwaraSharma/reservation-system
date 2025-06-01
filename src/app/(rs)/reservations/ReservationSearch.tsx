@@ -4,7 +4,7 @@ import SearchButton from "@/components/SearchButton";
 
 export default function ReservationSearch() {
   return (
-    <Form action="/tickets" className="flex gap-2 items-center">
+    <Form action="/reservations" className="flex gap-2 items-center">
       <Input
         name="searchText"
         type="text"

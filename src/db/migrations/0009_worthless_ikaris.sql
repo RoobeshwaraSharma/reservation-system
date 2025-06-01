@@ -1,0 +1,1 @@
+ALTER TABLE "reservation_rooms" ALTER COLUMN "assigned_date" SET DATA TYPE timestamp;

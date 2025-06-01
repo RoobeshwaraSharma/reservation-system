@@ -35,25 +35,30 @@ import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import Filter from "@/components/react-table/Filter";
 import { usePolling } from "@/hooks/usePolling";
-import { ReservationCicoSearchResultsType } from "@/lib/quaries/getReservationCicoSearchResult";
 
-type Props = {
-  data: ReservationCicoSearchResultsType;
+type RowType = {
+  roomNumber: string;
+  roomType: string;
+  bedType: string;
+  maxOccupants: number | null;
+  maxChildren: number | null;
+  status: string;
+  ratePerNight: string | null;
+  assignedDate: Date | null;
+  checkInTime: Date | null;
+  checkOutTime: Date | null;
 };
 
-type RowType = ReservationCicoSearchResultsType[0];
+type Props = {
+  data: RowType[];
+};
 
-export default function ReservationRoomTable({ data }: Props) {
+export default function ReservationCicoTable({ data }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [sorting, setSorting] = useState<SortingState>([
-    {
-      id: "checkInDate",
-      desc: false,
-    },
-  ]);
+  const [sorting, setSorting] = useState<SortingState>([]);
 
   usePolling(searchParams.get("searchText"), 30000);
 
@@ -62,59 +67,37 @@ export default function ReservationRoomTable({ data }: Props) {
     return page ? parseInt(page) - 1 : 0;
   }, [searchParams]);
 
-  const columnHeadersArray: Array<keyof RowType | "customerName"> = [
-    "customerName",
-    "checkInDate",
-    "checkOutDate",
-    "numAdults",
-    "numChildren",
+  const columnHeadersArray: Array<keyof RowType> = [
+    "roomNumber",
+    "roomType",
+    "bedType",
+    "maxOccupants",
+    "maxChildren",
     "status",
-    "createdBy",
-    "customerEmail",
+    "ratePerNight",
+    "assignedDate",
+    "checkInTime",
+    "checkOutTime",
   ];
 
-  const columnLabelMap: Record<string, string> = {
-    customerName: "Customer Name",
-    id: "ID",
-    checkInDate: "Check-In",
-    checkOutDate: "Check-Out",
-    numAdults: "# Adults",
-    numChildren: "# Children",
+  const columnLabelMap: Record<keyof RowType, string> = {
+    roomNumber: "Room #",
+    roomType: "Room Type",
+    bedType: "Bed Type",
+    maxOccupants: "Max Occupants",
+    maxChildren: "Max Children",
     status: "Status",
-    createdBy: "Created By",
-    customerEmail: "Email",
-    createdAt: "Created At",
-  };
-
-  const columnWidths = {
-    customerName: 200,
-    checkInDate: 150,
-    checkOutDate: 150,
-    numAdults: 100,
-    numChildren: 100,
-    status: 150,
-    createdBy: 150,
-    customerEmail: 250,
+    ratePerNight: "Rate/Night",
+    assignedDate: "Assigned Date",
+    checkInTime: "Check-In Time",
+    checkOutTime: "Check-Out Time",
   };
 
   const columnHelper = createColumnHelper<RowType>();
 
-  const columns = columnHeadersArray.map((columnName) => {
-    if (columnName === "customerName") {
-      return columnHelper.accessor(
-        (row) => `${row.firstName} ${row.lastName}`,
-        {
-          id: "customerName",
-          size: columnWidths.customerName,
-          header: () => <span>{columnLabelMap["customerName"]}</span>,
-          cell: ({ getValue }) => <span>{getValue()}</span>,
-        }
-      );
-    }
-
-    return columnHelper.accessor((row) => row[columnName as keyof RowType], {
+  const columns = columnHeadersArray.map((columnName) =>
+    columnHelper.accessor((row) => row[columnName], {
       id: columnName,
-      size: columnWidths[columnName as keyof typeof columnWidths] ?? 150,
       header: ({ column }) => (
         <Button
           variant="ghost"
@@ -135,37 +118,48 @@ export default function ReservationRoomTable({ data }: Props) {
       ),
       cell: ({ getValue }) => {
         const value = getValue();
-        if (
-          (columnName === "checkInDate" ||
-            columnName === "checkOutDate" ||
-            columnName === "createdAt") &&
-          value instanceof Date
-        ) {
-          return value.toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-          });
+
+        if (columnName === "checkInTime" || columnName === "checkOutTime") {
+          return value instanceof Date
+            ? value.toLocaleString("en-US", {
+                dateStyle: "short",
+                timeStyle: "short",
+              })
+            : "-";
+        }
+
+        if (columnName === "assignedDate") {
+          return value ? new Date(value).toLocaleDateString("en-US") : "-";
+        }
+
+        if (columnName === "ratePerNight" && typeof value === "string") {
+          return value ? `$${parseFloat(value).toFixed(2)}` : "-";
         }
 
         if (columnName === "status" && typeof value === "string") {
           switch (value) {
-            case "Occupied":
+            case "Active":
               return (
                 <div className="text-green-600 flex items-center gap-1 font-medium">
                   <CircleCheckIcon className="w-4 h-4" /> Confirmed
                 </div>
               );
-            case "Maintenance":
+            case "Cancelled":
               return (
                 <div className="text-red-500 flex items-center gap-1 font-medium">
                   <CircleXIcon className="w-4 h-4" /> Cancelled
                 </div>
               );
-            case "Available":
+            case "Completed":
               return (
                 <div className="text-blue-600 flex items-center gap-1 font-medium">
                   <CircleCheckIcon className="w-4 h-4" /> Completed
+                </div>
+              );
+            case "No-show":
+              return (
+                <div className="text-yellow-600 flex items-center gap-1 font-medium">
+                  <CircleXIcon className="w-4 h-4" /> No-show
                 </div>
               );
             default:
@@ -175,8 +169,8 @@ export default function ReservationRoomTable({ data }: Props) {
 
         return value ?? "-";
       },
-    });
-  });
+    })
+  );
 
   const table = useReactTable({
     data,
@@ -257,11 +251,6 @@ export default function ReservationRoomTable({ data }: Props) {
                     ? "bg-blue-50 dark:bg-blue-900/20"
                     : "bg-gray-50 dark:bg-muted/40"
                 }`}
-                onClick={() =>
-                  router.push(
-                    `/cico/cico-room?reservationId=${row.original.id}`
-                  )
-                }
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id} className="border">

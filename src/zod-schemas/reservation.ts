@@ -5,6 +5,7 @@ import { z } from "zod";
 // Define enums matching DB constraints
 export const reservationStatusEnum = z.enum([
   "Active",
+  "Inprogress",
   "Cancelled",
   "Completed",
   "No-show",

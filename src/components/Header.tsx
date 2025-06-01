@@ -18,7 +18,7 @@ export function Header() {
             title="home"
           >
             <h1 className="hidden sm:block text-xl font-bold m-0 mt-1">
-              Computer Repair Shop
+              Hotel Reservation
             </h1>
           </Link>
         </div>

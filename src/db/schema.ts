@@ -7,7 +7,6 @@ import {
   integer,
   text,
   numeric,
-  date,
   check,
 } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
@@ -123,7 +122,7 @@ export const reservationRooms = pgTable("reservation_rooms", {
   roomId: integer("room_id")
     .notNull()
     .references(() => rooms.id),
-  assignedDate: date("assigned_date"),
+  assignedDate: timestamp("assigned_date"),
   checkInTime: timestamp("check_in_time"),
   checkOutTime: timestamp("check_out_time"),
 });

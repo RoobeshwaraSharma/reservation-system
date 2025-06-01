@@ -2,9 +2,9 @@ import Form from "next/form";
 import { Input } from "@/components/ui/input";
 import SearchButton from "@/components/SearchButton";
 
-export default function ReservationSearch() {
+export default function ReservationCicoSearch() {
   return (
-    <Form action="/tickets" className="flex gap-2 items-center">
+    <Form action="/cico" className="flex gap-2 items-center">
       <Input
         name="searchText"
         type="text"
