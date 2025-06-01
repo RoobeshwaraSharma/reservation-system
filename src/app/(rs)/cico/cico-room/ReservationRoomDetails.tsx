@@ -1,5 +1,7 @@
 "use client";
+import { cancelReservation } from "@/app/actions/cancelReservation";
 import { checkInReservation } from "@/app/actions/checkInReservation";
+import { checkOutReservation } from "@/app/actions/checkOutReservation";
 import { Button } from "@/components/ui/button";
 import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
@@ -61,6 +63,89 @@ export default function ReservationRoomDetails({
               toast.dismiss(t);
               startTransition(() => {
                 executeCheckIn({ reservationId: reservation.id });
+              });
+            }}
+          >
+            Confirm
+          </Button>
+        </div>
+      </div>
+    ));
+  };
+
+  const { execute: executeCheckOut, isPending: isCheckingOut } = useAction(
+    checkOutReservation,
+    {
+      onSuccess({ data }) {
+        toast.success(data?.message ?? "Checked out successfully.");
+        router.refresh();
+      },
+      onError({ error }) {
+        console.log(error);
+        toast.error(`Check-out failed: ${error.serverError}`);
+      },
+    }
+  );
+
+  const handleCheckOut = () => {
+    toast.custom((t) => (
+      <div className="p-4 flex flex-col gap-3 bg-white dark:bg-zinc-900 rounded-md shadow-lg border dark:border-zinc-700">
+        <p className="text-sm font-medium text-gray-900 dark:text-white">
+          Confirm check-out for {reservation.firstName} {reservation.lastName}?
+        </p>
+        <div className="flex justify-end gap-2">
+          <Button variant="ghost" size="sm" onClick={() => toast.dismiss(t)}>
+            Cancel
+          </Button>
+          <Button
+            variant="default"
+            size="sm"
+            onClick={() => {
+              toast.dismiss(t);
+              startTransition(() => {
+                executeCheckOut({ reservationId: reservation.id });
+              });
+            }}
+          >
+            Confirm
+          </Button>
+        </div>
+      </div>
+    ));
+  };
+
+  const { execute: executeCancel, isPending: isCancelling } = useAction(
+    cancelReservation,
+    {
+      onSuccess({ data }) {
+        toast.success(data?.message ?? "Cancelled successfully.");
+        router.refresh();
+      },
+      onError({ error }) {
+        console.log(error);
+        toast.error(`Cancel failed: ${error.serverError}`);
+      },
+    }
+  );
+
+  const handleCancel = () => {
+    toast.custom((t) => (
+      <div className="p-4 flex flex-col gap-3 bg-white dark:bg-zinc-900 rounded-md shadow-lg border dark:border-zinc-700">
+        <p className="text-sm font-medium text-gray-900 dark:text-white">
+          Confirm cancellation for {reservation.firstName}{" "}
+          {reservation.lastName}?
+        </p>
+        <div className="flex justify-end gap-2">
+          <Button variant="ghost" size="sm" onClick={() => toast.dismiss(t)}>
+            Cancel
+          </Button>
+          <Button
+            variant="default"
+            size="sm"
+            onClick={() => {
+              toast.dismiss(t);
+              startTransition(() => {
+                executeCancel({ reservationId: reservation.id });
               });
             }}
           >
@@ -168,14 +253,24 @@ export default function ReservationRoomDetails({
         )}
 
         {reservation.status === "Inprogress" && (
-          <Button type="button" variant="secondary" title="Out">
-            Check Out
+          <Button
+            variant="secondary"
+            title="Out"
+            onClick={handleCheckOut}
+            disabled={isCheckingOut || isPending}
+          >
+            {isCheckingOut || isPending ? "Checking Out..." : "Check Out"}
           </Button>
         )}
 
         {reservation.status === "Active" && (
-          <Button type="button" variant="destructive" title="Cancel">
-            Cancel
+          <Button
+            variant="destructive"
+            title="Cancel"
+            onClick={handleCancel}
+            disabled={isCancelling || isPending}
+          >
+            {isCancelling || isPending ? "Cancelling..." : "Cancel"}
           </Button>
         )}
       </div>

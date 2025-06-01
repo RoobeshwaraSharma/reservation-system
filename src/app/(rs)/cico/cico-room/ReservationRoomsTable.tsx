@@ -86,7 +86,7 @@ export default function ReservationRoomTable({ data }: Props) {
     bedType: "Bed Type",
     maxOccupants: "Max Occupants",
     maxChildren: "Max Children",
-    status: "Status",
+    status: "Room Status",
     ratePerNight: "Rate/Night",
     assignedDate: "Assigned Date",
     checkInTime: "Check-In Time",

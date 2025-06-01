@@ -10,8 +10,8 @@ export async function getReservations() {
       sql`CASE ${reservations.status}
           WHEN 'Active' THEN 1
           WHEN 'Inprogress' THEN 2
-          WHEN 'Cancelled' THEN 3
-          WHEN 'Completed' THEN 4
+          WHEN 'Cancelled' THEN 4
+          WHEN 'Completed' THEN 3
           WHEN 'No-show' THEN 5
           ELSE 5
         END`,
