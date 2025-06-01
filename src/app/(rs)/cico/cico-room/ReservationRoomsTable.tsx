@@ -53,7 +53,7 @@ type Props = {
   data: RowType[];
 };
 
-export default function ReservationCicoTable({ data }: Props) {
+export default function ReservationRoomTable({ data }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -138,28 +138,22 @@ export default function ReservationCicoTable({ data }: Props) {
 
         if (columnName === "status" && typeof value === "string") {
           switch (value) {
-            case "Active":
+            case "Occupied":
               return (
                 <div className="text-green-600 flex items-center gap-1 font-medium">
-                  <CircleCheckIcon className="w-4 h-4" /> Confirmed
+                  <CircleCheckIcon className="w-4 h-4" /> Occuiped
                 </div>
               );
-            case "Cancelled":
+            case "Maintenance":
               return (
                 <div className="text-red-500 flex items-center gap-1 font-medium">
-                  <CircleXIcon className="w-4 h-4" /> Cancelled
+                  <CircleXIcon className="w-4 h-4" /> Under Maintanence
                 </div>
               );
-            case "Completed":
+            case "Available":
               return (
                 <div className="text-blue-600 flex items-center gap-1 font-medium">
-                  <CircleCheckIcon className="w-4 h-4" /> Completed
-                </div>
-              );
-            case "No-show":
-              return (
-                <div className="text-yellow-600 flex items-center gap-1 font-medium">
-                  <CircleXIcon className="w-4 h-4" /> No-show
+                  <CircleCheckIcon className="w-4 h-4" /> Available
                 </div>
               );
             default:

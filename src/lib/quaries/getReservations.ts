@@ -9,9 +9,10 @@ export async function getReservations() {
     .orderBy(
       sql`CASE ${reservations.status}
           WHEN 'Active' THEN 1
-          WHEN 'Cancelled' THEN 2
-          WHEN 'Completed' THEN 3
-          WHEN 'No-show' THEN 4
+          WHEN 'Inprogress' THEN 2
+          WHEN 'Cancelled' THEN 3
+          WHEN 'Completed' THEN 4
+          WHEN 'No-show' THEN 5
           ELSE 5
         END`,
       desc(reservations.checkInDate)

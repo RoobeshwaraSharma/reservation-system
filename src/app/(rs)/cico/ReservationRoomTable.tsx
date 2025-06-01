@@ -28,6 +28,7 @@ import {
   ArrowUpDown,
   ArrowDown,
   ArrowUp,
+  Loader,
 } from "lucide-react";
 
 import { useRouter, useSearchParams } from "next/navigation";
@@ -43,17 +44,12 @@ type Props = {
 
 type RowType = ReservationCicoSearchResultsType[0];
 
-export default function ReservationRoomTable({ data }: Props) {
+export default function ReservationCicoTable({ data }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [sorting, setSorting] = useState<SortingState>([
-    {
-      id: "checkInDate",
-      desc: false,
-    },
-  ]);
+  const [sorting, setSorting] = useState<SortingState>([]);
 
   usePolling(searchParams.get("searchText"), 30000);
 
@@ -150,22 +146,35 @@ export default function ReservationRoomTable({ data }: Props) {
 
         if (columnName === "status" && typeof value === "string") {
           switch (value) {
-            case "Occupied":
+            case "Active":
               return (
                 <div className="text-green-600 flex items-center gap-1 font-medium">
                   <CircleCheckIcon className="w-4 h-4" /> Confirmed
                 </div>
               );
-            case "Maintenance":
+            case "Cancelled":
               return (
                 <div className="text-red-500 flex items-center gap-1 font-medium">
                   <CircleXIcon className="w-4 h-4" /> Cancelled
                 </div>
               );
-            case "Available":
+            case "Completed":
               return (
                 <div className="text-blue-600 flex items-center gap-1 font-medium">
                   <CircleCheckIcon className="w-4 h-4" /> Completed
+                </div>
+              );
+            case "No-show":
+              return (
+                <div className="text-gray-600 flex items-center gap-1 font-medium">
+                  <CircleXIcon className="w-4 h-4" /> No-show
+                </div>
+              );
+
+            case "Inprogress":
+              return (
+                <div className="text-yellow-600 flex items-center gap-1 font-medium">
+                  <Loader className="w-4 h-4" /> Inprogress
                 </div>
               );
             default:

@@ -1,6 +1,10 @@
 "use client";
+import { checkInReservation } from "@/app/actions/checkInReservation";
 import { Button } from "@/components/ui/button";
+import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
+import { useTransition } from "react";
+import { toast } from "sonner";
 
 type Props = {
   reservation: {
@@ -24,7 +28,48 @@ export default function ReservationRoomDetails({
   roomCount,
 }: Props) {
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
 
+  const { execute: executeCheckIn, isPending: isCheckingIn } = useAction(
+    checkInReservation,
+    {
+      onSuccess({ data }) {
+        toast.success(data?.message ?? "Checked in successfully.");
+        router.refresh();
+      },
+      onError({ error }) {
+        console.log(error);
+        toast.error(`Check-in failed: ${error.serverError}`);
+      },
+    }
+  );
+
+  const handleCheckIn = () => {
+    toast.custom((t) => (
+      <div className="p-4 flex flex-col gap-3 bg-white dark:bg-zinc-900 rounded-md shadow-lg border dark:border-zinc-700">
+        <p className="text-sm font-medium text-gray-900 dark:text-white">
+          Confirm check-in for {reservation.firstName} {reservation.lastName}?
+        </p>
+        <div className="flex justify-end gap-2">
+          <Button variant="ghost" size="sm" onClick={() => toast.dismiss(t)}>
+            Cancel
+          </Button>
+          <Button
+            variant="default"
+            size="sm"
+            onClick={() => {
+              toast.dismiss(t);
+              startTransition(() => {
+                executeCheckIn({ reservationId: reservation.id });
+              });
+            }}
+          >
+            Confirm
+          </Button>
+        </div>
+      </div>
+    ));
+  };
   return (
     <div className="bg-white dark:bg-zinc-900 border dark:border-zinc-700 rounded-xl shadow p-6 mb-6 w-full max-w-6xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
@@ -112,8 +157,13 @@ export default function ReservationRoomDetails({
         )}
 
         {roomCount > 0 && reservation.status === "Active" && (
-          <Button variant="default" title="In">
-            Check In
+          <Button
+            variant="default"
+            title="In"
+            onClick={handleCheckIn}
+            disabled={isCheckingIn || isPending}
+          >
+            {isCheckingIn || isPending ? "Checking In..." : "Check In"}
           </Button>
         )}
 

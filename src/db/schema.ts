@@ -107,7 +107,7 @@ export const reservations = pgTable(
   (table) => [
     check(
       "reservation_status_check",
-      sql`${table.status} IN ('Active', 'Cancelled', 'Completed', 'No-show')`
+      sql`${table.status} IN ('Active', 'Cancelled', 'Completed', 'No-show','Inprogress')`
     ),
     check("created_by_check", sql`${table.createdBy} IN ('Customer', 'Clerk')`),
   ]
