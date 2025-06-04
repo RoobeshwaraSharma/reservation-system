@@ -3,9 +3,10 @@ import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import ReservationSearch from "./ReservationSearch";
 import ReservationTable from "./ReservationTable";
 import { getReservationSearchResults } from "@/lib/quaries/getReservationSearchResult";
+import CreateReservation from "./CreateReservation";
 
 export const metadata = {
-  title: "Ticket Search",
+  title: "Reservertion Search",
 };
 
 export default async function Tickets({
@@ -23,10 +24,13 @@ export default async function Tickets({
     return (
       <>
         <ReservationSearch />
+        <div className="flex justify-center">
+          <CreateReservation />
+        </div>
         {results.length ? (
           <ReservationTable data={results} />
         ) : (
-          <p className="mt-4">No open tickets found</p>
+          <p className="mt-4">No reservations found</p>
         )}
       </>
     );
@@ -40,6 +44,7 @@ export default async function Tickets({
   return (
     <>
       <ReservationSearch />
+      <CreateReservation />
       {results.length ? (
         <ReservationTable data={results} />
       ) : (

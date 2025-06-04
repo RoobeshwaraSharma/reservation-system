@@ -22,6 +22,9 @@ import { toast } from "sonner";
 import { LoaderCircle } from "lucide-react";
 import { z } from "zod";
 import { KindeUser } from "@kinde-oss/kinde-auth-nextjs/types";
+import { useRouter } from "next/navigation";
+import { useTransition } from "react";
+import { cancelReservation } from "@/app/actions/cancelReservation";
 
 type Props = {
   reservation?: {
@@ -63,9 +66,12 @@ export default function ReservationForm({
   isEditable = true,
   user,
 }: Props) {
+  const router = useRouter();
   const today = new Date();
   const tomorrow = new Date();
   tomorrow.setDate(today.getDate() + 1);
+
+  const [isPending, startTransition] = useTransition();
 
   const defaultValues: insertReservationSchemaType = {
     id: reservation?.id ?? "(New)",
@@ -79,7 +85,6 @@ export default function ReservationForm({
     status: (reservation?.status as ReservationStatus) ?? "Active",
     createdBy: (reservation?.createdBy as CreatedBy) ?? "Customer",
   };
-
   const form = useForm<insertReservationSchemaType>({
     mode: "onBlur",
     resolver: zodResolver(insertReservationSchema),
@@ -106,10 +111,51 @@ export default function ReservationForm({
     executeSave(data);
   }
 
+  const { execute: executeCancel, isPending: isCancelling } = useAction(
+    cancelReservation,
+    {
+      onSuccess({ data }) {
+        toast.success(data?.message ?? "Cancelled successfully.");
+        router.refresh();
+      },
+      onError({ error }) {
+        console.log(error);
+        toast.error(`Cancel failed: ${error.serverError}`);
+      },
+    }
+  );
+
+  const handleCancel = (reservationId: number) => {
+    toast.custom((t) => (
+      <div className="p-4 flex flex-col gap-3 bg-white dark:bg-zinc-900 rounded-md shadow-lg border dark:border-zinc-700">
+        <p className="text-sm font-medium text-gray-900 dark:text-white">
+          Are you sure ? You want to cancel the reservation?
+        </p>
+        <div className="flex justify-end gap-2">
+          <Button variant="ghost" size="sm" onClick={() => toast.dismiss(t)}>
+            Cancel
+          </Button>
+          <Button
+            variant="default"
+            size="sm"
+            onClick={() => {
+              toast.dismiss(t);
+              startTransition(() => {
+                executeCancel({ reservationId });
+              });
+            }}
+          >
+            Confirm
+          </Button>
+        </div>
+      </div>
+    ));
+  };
+
   return (
     <div className="flex flex-col gap-1 sm:px-8">
       <DisplayServerActionResponse result={saveResult} />
-      <div>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
         <h2 className="text-2xl font-bold">
           {reservation?.id && isEditable
             ? `Edit Reservation #${reservation.id}`
@@ -117,6 +163,13 @@ export default function ReservationForm({
             ? `View Reservation #${reservation.id}`
             : "New Reservation Form"}
         </h2>
+        <Button
+          onClick={() => router.push("/reservations")}
+          variant="secondary"
+          className="mt-4 sm:mt-0"
+        >
+          Back
+        </Button>
       </div>
       <Form {...form}>
         <form
@@ -176,21 +229,21 @@ export default function ReservationForm({
               fieldTitle="Status"
               nameInSchema="status"
               data={statusOptions}
-              disabled={!isEditable}
+              disabled
             />
 
             <SelectWithLabel<insertReservationSchemaType>
               fieldTitle="Created By"
               nameInSchema="createdBy"
               data={createdByOptions}
-              disabled={!isEditable}
+              disabled
             />
 
             {isEditable ? (
               <div className="flex gap-2 mt-4">
                 <Button
                   type="submit"
-                  className="w-3/4"
+                  className="w-2/4"
                   variant="default"
                   title="Save"
                   disabled={isSaving}
@@ -215,6 +268,19 @@ export default function ReservationForm({
                 >
                   Reset
                 </Button>
+                {reservation?.id && (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    title="Cancel"
+                    onClick={() => {
+                      handleCancel(reservation.id);
+                    }}
+                    disabled={isCancelling || isPending}
+                  >
+                    {isCancelling || isPending ? "Cancelling..." : "Cancel"}
+                  </Button>
+                )}
               </div>
             ) : null}
           </div>

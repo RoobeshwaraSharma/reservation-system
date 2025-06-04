@@ -28,7 +28,9 @@ const baseInsertReservationSchema = createInsertSchema(reservations, {
   checkInDate: () =>
     z.coerce.date({ errorMap: () => ({ message: "Invalid check-in date" }) }),
   checkOutDate: () =>
-    z.coerce.date({ errorMap: () => ({ message: "Invalid check-out date" }) }),
+    z.coerce.date({
+      errorMap: () => ({ message: "Invalid check-out date" }),
+    }),
 
   status: () => reservationStatusEnum,
   createdBy: () => createdByEnum,

@@ -49,7 +49,12 @@ export default async function ReservationFormPage({
       );
     }
 
-    return <ReservationForm reservation={reservation} isEditable={true} />;
+    return (
+      <ReservationForm
+        reservation={reservation}
+        isEditable={reservation.status === "Active"}
+      />
+    );
   }
 
   return null;
