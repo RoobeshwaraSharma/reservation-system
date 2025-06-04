@@ -283,6 +283,26 @@ export default function ReservationForm({
                 )}
               </div>
             ) : null}
+            {reservation?.id && (
+              <Button
+                className="mt-4"
+                type="button"
+                variant="default"
+                onClick={async () => {
+                  const res = await fetch("/api/create-checkout-session", {
+                    method: "POST",
+                    body: JSON.stringify({ reservationId: reservation.id }),
+                  });
+
+                  const { url } = await res.json();
+                  if (url) {
+                    window.location.href = url;
+                  }
+                }}
+              >
+                Pay Online
+              </Button>
+            )}
           </div>
         </form>
       </Form>

@@ -146,3 +146,91 @@ export const reservationRoomsRelations = relations(
     }),
   })
 );
+
+export const bill = pgTable(
+  "bill",
+  {
+    id: serial("bill_id").primaryKey(),
+    createdAt: timestamp("created_at").defaultNow(),
+    totalAmount: numeric("total_amount", { precision: 10, scale: 2 }),
+    status: varchar("status", { length: 20 })
+      .notNull()
+      .default("Payment Pending"),
+    reservationId: integer("reservation_id")
+      .notNull()
+      .unique() // Ensures 1-to-1 relationship
+      .references(() => reservations.id),
+  },
+  (bill) => [
+    check(
+      "bill_status_check",
+      sql`${bill.status} IN ('Payment Pending', 'Payment Paid')`
+    ),
+  ]
+);
+
+export const reservationsRelations = relations(reservations, ({ one }) => ({
+  bill: one(bill, {
+    fields: [reservations.id],
+    references: [bill.reservationId],
+  }),
+}));
+
+export const payments = pgTable(
+  "payments",
+  {
+    id: serial("payment_id").primaryKey(),
+
+    billId: integer("bill_id")
+      .notNull()
+      .references(() => bill.id),
+
+    amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
+
+    paymentMethod: varchar("payment_method", { length: 50 }).notNull(),
+
+    paymentStatus: varchar("payment_status", { length: 30 }).notNull(),
+
+    paymentDate: timestamp("payment_date").defaultNow(),
+  },
+  (payments) => [
+    check(
+      "payment_status_check",
+      sql`${payments.paymentStatus} IN (
+        'requires_payment_method',
+        'requires_confirmation',
+        'requires_action',
+        'processing',
+        'succeeded',
+        'canceled',
+        'failed'
+      )`
+    ),
+    check(
+      "payment_method_check",
+      sql`${payments.paymentMethod} IN (
+        'card',
+        'bank_transfer',
+        'us_bank_account',
+        'klarna',
+        'paypal',
+        'cashapp'
+      )`
+    ),
+  ]
+);
+
+export const paymentsRelations = relations(payments, ({ one }) => ({
+  bill: one(bill, {
+    fields: [payments.billId],
+    references: [bill.id],
+  }),
+}));
+
+export const billsRelations = relations(bill, ({ one, many }) => ({
+  reservation: one(reservations, {
+    fields: [bill.reservationId],
+    references: [reservations.id],
+  }),
+  payments: many(payments),
+}));
