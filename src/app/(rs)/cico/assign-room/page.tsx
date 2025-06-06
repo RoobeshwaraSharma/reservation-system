@@ -1,7 +1,7 @@
 import { Backbutton } from "@/components/BackButton";
 import { getReservation } from "@/lib/quaries/getReservation";
 import AssignRoomForm from "./AssignRoomForm";
-import { getAvailableRooms } from "@/lib/quaries/getRooms";
+import { getAvailableRooms } from "@/lib/quaries/getAvailableRooms";
 
 export async function generateMetadata({
   searchParams,

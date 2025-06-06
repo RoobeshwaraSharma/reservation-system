@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { db } from "@/db";
-import { bill } from "@/db/schema";
+import { bill, reservations } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -17,6 +17,13 @@ export async function POST(req: NextRequest) {
     .where(eq(bill.reservationId, reservationId));
 
   const currentBill = result[0];
+
+  const reservation = await db
+    .select()
+    .from(reservations)
+    .where(eq(reservations.id, reservationId));
+  const currentReservation = reservation[0];
+
   if (!currentBill) {
     return NextResponse.json({ error: "Bill not found" }, { status: 404 });
   }
@@ -28,7 +35,8 @@ export async function POST(req: NextRequest) {
         price_data: {
           currency: "usd",
           product_data: {
-            name: `Reservation Bill #${currentBill.id}`,
+            name: `Reservation Bill #${currentBill.id} for Reservation #${reservationId}`,
+            description: `${currentReservation.customerEmail} - ${currentReservation.firstName} ${currentReservation.lastName}`,
           },
           unit_amount: parseFloat(currentBill.totalAmount as string) * 100, // in cents
         },

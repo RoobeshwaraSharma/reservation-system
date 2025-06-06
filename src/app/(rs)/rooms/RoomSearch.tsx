@@ -1,20 +1,20 @@
 import Form from "next/form";
 import { Input } from "@/components/ui/input";
 import SearchButton from "@/components/SearchButton";
-import CreateReservation from "./CreateReservation";
+import CreateRoom from "./CreateRoom";
 
-export default function ReservationSearch() {
+export default function RoomSearch() {
   return (
-    <Form action="/reservations" className="flex gap-2 items-center">
+    <Form action="/rooms" className="flex gap-2 items-center">
       <Input
         name="searchText"
         type="text"
-        placeholder="Search Reservation"
+        placeholder="Search Room"
         className="w-full"
         autoFocus
       />
       <SearchButton />
-      <CreateReservation />
+      <CreateRoom />
     </Form>
   );
 }

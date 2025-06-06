@@ -234,3 +234,49 @@ export const billsRelations = relations(bill, ({ one, many }) => ({
   }),
   payments: many(payments),
 }));
+
+export const services = pgTable("services", {
+  id: serial("service_id").primaryKey(),
+  name: varchar("name").unique().notNull(),
+  chargePerPerson: numeric("charge_per_person", { precision: 10, scale: 2 }),
+});
+
+export const reservationServices = pgTable("reservation_services", {
+  id: serial("id").primaryKey(),
+  reservationId: integer("reservation_id")
+    .notNull()
+    .references(() => reservations.id),
+  serviceId: integer("service_id")
+    .notNull()
+    .references(() => services.id),
+  assignDate: timestamp("assigned_date").defaultNow(),
+  totalCharge: numeric("total_charge", { precision: 10, scale: 2 }),
+});
+
+// RELATION FROM RESERVATIONS TO RESERVATION SERVICES (MANY-TO-MANY THROUGH reservationServices)
+export const reservationsServiceRelations = relations(
+  reservations,
+  ({ many }) => ({
+    reservationServices: many(reservationServices), // Many services for a reservation
+  })
+);
+
+// RELATION FROM SERVICES TO RESERVATION SERVICES (MANY-TO-MANY THROUGH reservationServices)
+export const servicesRelations = relations(services, ({ many }) => ({
+  reservationServices: many(reservationServices), // Many reservations for a service
+}));
+
+// RELATION FROM RESERVATION SERVICES TO BOTH RESERVATIONS AND SERVICES
+export const reservationServicesRelations = relations(
+  reservationServices,
+  ({ one }) => ({
+    reservation: one(reservations, {
+      fields: [reservationServices.reservationId],
+      references: [reservations.id],
+    }),
+    service: one(services, {
+      fields: [reservationServices.serviceId],
+      references: [services.id],
+    }),
+  })
+);

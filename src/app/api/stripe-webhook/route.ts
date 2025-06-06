@@ -2,7 +2,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { db } from "@/db";
-import { payments } from "@/db/schema";
+import { bill, payments } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -38,13 +39,22 @@ export async function POST(req: NextRequest) {
       : "0";
 
     if (billId) {
+      // First, insert the payment record into the payments table
       await db.insert(payments).values({
         billId: parseInt(billId),
         amount,
         paymentMethod: session.payment_method_types[0],
-        paymentStatus: "succeeded",
+        paymentStatus: "succeeded", // Stripe payment succeeded
         paymentDate: new Date(),
       });
+
+      // Then, update the status of the bill to 'Payment Paid'
+      await db
+        .update(bill)
+        .set({
+          status: "Payment Paid", // Set the bill status to 'Payment Paid'
+        })
+        .where(eq(bill.id, parseInt(billId)));
     }
   }
 
