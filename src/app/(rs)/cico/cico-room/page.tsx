@@ -3,6 +3,10 @@ import ReservationRoomDetails from "./ReservationRoomDetails";
 import { getReservation } from "@/lib/quaries/getReservation";
 import ReservationRoomstable from "./ReservationRoomsTable";
 import { getRoomsForReservation } from "@/lib/quaries/getReservedRooms";
+import { getServicesForReservation } from "@/lib/quaries/getReservationServices";
+import ReservationServiceTable from "./ReservationServicesTable";
+import { getPayments } from "@/lib/quaries/getPayments";
+import PaymentsTable from "./PaymentsTable";
 
 export async function generateMetadata({
   searchParams,
@@ -43,6 +47,11 @@ export default async function CheckInOutRservation({
 
   const reservation = await getReservation(parseInt(reservationId));
   const reservedRooms = await getRoomsForReservation(parseInt(reservationId));
+  const reservedServices = await getServicesForReservation(
+    parseInt(reservationId)
+  );
+
+  const payments = await getPayments(parseInt(reservationId));
   return (
     <>
       <ReservationRoomDetails
@@ -51,9 +60,34 @@ export default async function CheckInOutRservation({
       />
       <div className="mt-4 text-center">
         {reservedRooms.length ? (
-          <ReservationRoomstable data={reservedRooms} />
+          <>
+            <h1 className="font-bold">Assinged Rooms</h1>
+            <ReservationRoomstable data={reservedRooms} />
+          </>
         ) : (
           <p>Assigned Rooms Not Found</p>
+        )}
+      </div>
+
+      <div className="mt-4 text-center">
+        {reservedServices.length ? (
+          <>
+            <h1 className="font-bold">Assinged Services</h1>
+            <ReservationServiceTable data={reservedServices} />
+          </>
+        ) : (
+          <p>No Services Assigned</p>
+        )}
+      </div>
+
+      <div className="mt-4 text-center">
+        {payments.length ? (
+          <>
+            <h1 className="font-bold">Customer Payments</h1>
+            <PaymentsTable data={payments} />
+          </>
+        ) : (
+          <p>No Payments Found</p>
         )}
       </div>
     </>

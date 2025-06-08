@@ -241,6 +241,19 @@ export default function ReservationRoomDetails({
           </Button>
         )}
 
+        {(reservation.status === "Active" ||
+          reservation.status === "Inprogress") && (
+          <Button
+            variant="default"
+            title="Assign-service"
+            onClick={() =>
+              router.push(`assign-service?reservationId=${reservation.id}`)
+            }
+          >
+            Assign Service
+          </Button>
+        )}
+
         {roomCount > 0 && reservation.status === "Active" && (
           <Button
             variant="default"

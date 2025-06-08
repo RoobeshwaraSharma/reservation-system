@@ -2,8 +2,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { db } from "@/db";
-import { bill, payments } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { payments } from "@/db/schema";
+// import { eq } from "drizzle-orm";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
@@ -48,13 +48,13 @@ export async function POST(req: NextRequest) {
         paymentDate: new Date(),
       });
 
-      // Then, update the status of the bill to 'Payment Paid'
-      await db
-        .update(bill)
-        .set({
-          status: "Payment Paid", // Set the bill status to 'Payment Paid'
-        })
-        .where(eq(bill.id, parseInt(billId)));
+      // // Then, update the status of the bill to 'Payment Paid'
+      // await db
+      //   .update(bill)
+      //   .set({
+      //     status: "Payment Paid", // Set the bill status to 'Payment Paid'
+      //   })
+      //   .where(eq(bill.id, parseInt(billId)));
     }
   }
 
