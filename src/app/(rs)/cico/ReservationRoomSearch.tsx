@@ -1,6 +1,7 @@
 import Form from "next/form";
 import { Input } from "@/components/ui/input";
 import SearchButton from "@/components/SearchButton";
+import CreateReservation from "./CreateReservation";
 
 export default function ReservationCicoSearch() {
   return (
@@ -13,6 +14,7 @@ export default function ReservationCicoSearch() {
         autoFocus
       />
       <SearchButton />
+      <CreateReservation />
     </Form>
   );
 }
