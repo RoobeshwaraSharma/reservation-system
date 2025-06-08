@@ -23,7 +23,7 @@ const baseInsertReservationSchema = createInsertSchema(reservations, {
   firstName: (schema) => schema.firstName.min(1, "First name is required"),
   lastName: (schema) => schema.lastName.min(1, "Last name is required"),
 
-  numAdults: () => z.coerce.number().min(0).default(1),
+  numAdults: () => z.coerce.number().min(1).default(1),
   numChildren: () => z.coerce.number().min(0).default(0),
   checkInDate: () =>
     z.coerce.date({ errorMap: () => ({ message: "Invalid check-in date" }) }),

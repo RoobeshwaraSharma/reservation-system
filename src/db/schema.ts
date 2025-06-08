@@ -164,7 +164,7 @@ export const bill = pgTable(
   (bill) => [
     check(
       "bill_status_check",
-      sql`${bill.status} IN ('Payment Pending', 'Payment Paid')`
+      sql`${bill.status} IN ('Payment Pending', 'Payment Paid','Partial Payment')`
     ),
   ]
 );
@@ -214,7 +214,8 @@ export const payments = pgTable(
         'us_bank_account',
         'klarna',
         'paypal',
-        'cashapp'
+        'cashapp',
+        'unknown'
       )`
     ),
   ]

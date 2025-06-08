@@ -243,7 +243,7 @@ export default function ReservationForm({
               <div className="flex gap-2 mt-4">
                 <Button
                   type="submit"
-                  className="w-2/4"
+                  className="w-3/4"
                   variant="default"
                   title="Save"
                   disabled={isSaving}
