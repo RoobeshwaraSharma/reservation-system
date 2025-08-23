@@ -276,6 +276,17 @@ export default function ReservationRoomDetails({
           </Button>
         )}
 
+        {(reservation.status === "Completed" ||
+          reservation.status === "Inprogress") && (
+          <Button
+            variant="outline"
+            title="Generate Statement"
+            onClick={() => router.push(`/checkout-statement/${reservation.id}`)}
+          >
+            Generate Statement
+          </Button>
+        )}
+
         {reservation.status === "Active" && (
           <Button
             variant="destructive"

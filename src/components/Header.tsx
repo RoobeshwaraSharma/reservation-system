@@ -54,6 +54,9 @@ export function Header({ isCustomer }: Props) {
             choices={[
               { title: "Search Rooms", href: "/rooms" },
               { title: "Search Services", href: "/services" },
+              { title: "Suite Management", href: "/suites" },
+              { title: "Travel Company Booking", href: "/travel-company" },
+              { title: "Reports", href: "/reports" },
             ]}
           />
 

@@ -101,6 +101,8 @@ export const reservations = pgTable(
 
     status: varchar("status", { length: 20 }).notNull(),
     createdBy: varchar("created_by", { length: 20 }).notNull(),
+    isTravelCompany: boolean("is_travel_company").default(false),
+    travelCompanyName: varchar("travel_company_name", { length: 100 }),
 
     createdAt: timestamp("created_at").defaultNow(),
   },
