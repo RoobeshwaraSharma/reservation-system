@@ -3,12 +3,12 @@ import { redirect } from "next/navigation";
 import { TravelCompanyBulkBookingForm } from "./TravelCompanyBulkBookingForm";
 
 export default async function TravelCompanyPage() {
-  const { getPermission } = getKindeServerSession();
-  const employeePermission = await getPermission("employee");
+  // const { getPermission } = getKindeServerSession();
+  // const employeePermission = await getPermission("employee");
 
-  if (!employeePermission?.isGranted) {
-    redirect("/");
-  }
+  // if (!employeePermission?.isGranted) {
+  //   redirect("/");
+  // }
 
   return (
     <div className="space-y-6">

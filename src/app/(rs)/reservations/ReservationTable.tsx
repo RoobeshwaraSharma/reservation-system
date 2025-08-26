@@ -51,7 +51,7 @@ export default function ReservationTable({ data }: Props) {
   const [sorting, setSorting] = useState<SortingState>([
     {
       id: "checkInDate",
-      desc: false,
+      desc: true,
     },
   ]);
 

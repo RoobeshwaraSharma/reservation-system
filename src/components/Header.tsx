@@ -8,8 +8,9 @@ import { NavButtonMenu } from "./NavButtonMenu";
 
 type Props = {
   isCustomer: boolean;
+  isManager?: boolean;
 };
-export function Header({ isCustomer }: Props) {
+export function Header({ isCustomer, isManager }: Props) {
   return (
     <header className="animate-slide bg-background h-12 p-2 border-b sticky top-0 z-20">
       <div className="flex h-8 items-center justify-between w-full">
@@ -44,21 +45,25 @@ export function Header({ isCustomer }: Props) {
               choices={[
                 { title: "Search Reservations", href: "/reservations" },
                 { title: "New Reservation", href: "/reservations/form" },
+                { title: "Suite Management", href: "/suites" },
+                { title: "Travel Company Booking", href: "/travel-company" },
               ]}
             />
           )}
 
-          <NavButtonMenu
-            icon={MenuIcon}
-            label="Hotel Menu"
-            choices={[
-              { title: "Search Rooms", href: "/rooms" },
-              { title: "Search Services", href: "/services" },
-              { title: "Suite Management", href: "/suites" },
-              { title: "Travel Company Booking", href: "/travel-company" },
-              { title: "Reports", href: "/reports" },
-            ]}
-          />
+          {!isCustomer && (
+            <NavButtonMenu
+              icon={MenuIcon}
+              label="Hotel Menu"
+              choices={[
+                { title: "Search Rooms", href: "/rooms" },
+                { title: "Search Services", href: "/services" },
+                { title: "Suite Management", href: "/suites" },
+                { title: "Travel Company Booking", href: "/travel-company" },
+                ...(isManager ? [{ title: "Reports", href: "/reports" }] : []),
+              ]}
+            />
+          )}
 
           <ModeToggle />
 
