@@ -4,12 +4,13 @@ import { SuiteBookingForm } from "./SuiteBookingForm";
 import { SuiteAvailability } from "./SuiteAvailability";
 
 export default async function SuitesPage() {
-  // const { getPermission } = getKindeServerSession();
-  // const employeePermission = await getPermission("employee");
+  const { getUser, getPermission } = getKindeServerSession();
+  const user = await getUser();
+  const employeePermission = await getPermission("employee");
 
-  // if (!employeePermission?.isGranted) {
-  //   redirect("/");
-  // }
+  if (!user) {
+    redirect("/");
+  }
 
   return (
     <div className="space-y-8">
@@ -21,7 +22,10 @@ export default async function SuitesPage() {
       </div>
 
       <div className="grid gap-8 lg:grid-cols-2">
-        <SuiteBookingForm />
+        <SuiteBookingForm
+          user={user}
+          employeePermission={employeePermission?.isGranted ?? false}
+        />
         <SuiteAvailability />
       </div>
     </div>

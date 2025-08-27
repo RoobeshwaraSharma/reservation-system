@@ -5,8 +5,13 @@ import { useRouter } from "next/navigation";
 export default function CreateReservation() {
   const router = useRouter();
   return (
-    <Button type="button" onClick={() => router.push("/reservations/form")}>
-      New Reservation
-    </Button>
+    <>
+      <Button type="button" onClick={() => router.push("/reservations/form")}>
+        New Reservation
+      </Button>
+      <Button type="button" onClick={() => router.push("/suites")}>
+        New Suite Booking
+      </Button>
+    </>
   );
 }

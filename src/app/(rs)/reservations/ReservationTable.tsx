@@ -71,6 +71,8 @@ export default function ReservationTable({ data }: Props) {
     "status",
     "createdBy",
     "customerEmail",
+    "billTotalAmount",
+    "billStatus",
   ];
 
   const columnLabelMap: Record<keyof RowType, string> = {
@@ -82,6 +84,8 @@ export default function ReservationTable({ data }: Props) {
     status: "Status",
     createdBy: "Created By",
     customerEmail: "Email",
+    billTotalAmount: "Total Amount",
+    billStatus: "Payment Status",
   };
 
   const columnWidths = {
@@ -92,6 +96,8 @@ export default function ReservationTable({ data }: Props) {
     status: 150,
     createdBy: 150,
     customerEmail: 250,
+    billTotalAmount: 150,
+    billStatus: 150,
   };
 
   const columnHelper = createColumnHelper<RowType>();
@@ -163,6 +169,39 @@ export default function ReservationTable({ data }: Props) {
                 {value === "No-show" && (
                   <div className="text-yellow-500 flex items-center gap-1">
                     <CircleXIcon className="w-4 h-4" /> No-show
+                  </div>
+                )}
+              </div>
+            );
+          }
+          if (columnName === "billTotalAmount") {
+            return (
+              <div className="text-left font-medium">
+                {value ? `$${parseFloat(value.toString()).toFixed(2)}` : "N/A"}
+              </div>
+            );
+          }
+          if (columnName === "billStatus" && typeof value === "string") {
+            return (
+              <div className="grid place-content-center font-medium">
+                {value === "Payment Paid" && (
+                  <div className="text-green-600 flex items-center gap-1">
+                    <CircleCheckIcon className="w-4 h-4" /> Paid
+                  </div>
+                )}
+                {value === "Payment Pending" && (
+                  <div className="text-yellow-500 flex items-center gap-1">
+                    <CircleXIcon className="w-4 h-4" /> Pending
+                  </div>
+                )}
+                {value === "Partial Payment" && (
+                  <div className="text-blue-500 flex items-center gap-1">
+                    <CircleCheckIcon className="w-4 h-4" /> Partial
+                  </div>
+                )}
+                {!value && (
+                  <div className="text-gray-500 flex items-center gap-1">
+                    <CircleXIcon className="w-4 h-4" /> No Bill
                   </div>
                 )}
               </div>

@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { LoaderCircle } from "lucide-react";
 import { z } from "zod";
 import { useEffect, useState } from "react";
+import { KindeUser } from "@kinde-oss/kinde-auth-nextjs/types";
 
 const suiteBookingSchema = z
   .object({
@@ -53,7 +54,14 @@ type Suite = {
   status: string;
 };
 
-export function SuiteBookingForm() {
+export function SuiteBookingForm({
+  user,
+  employeePermission,
+}: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  user: KindeUser<Record<string, any>>;
+  employeePermission: boolean;
+}) {
   const [availableSuites, setAvailableSuites] = useState<Suite[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -80,9 +88,9 @@ export function SuiteBookingForm() {
   tomorrow.setDate(today.getDate() + 1);
 
   const defaultValues: SuiteBookingSchemaType = {
-    customerEmail: "",
-    firstName: "",
-    lastName: "",
+    customerEmail: employeePermission ? "" : user?.email ?? "",
+    firstName: employeePermission ? "" : user?.given_name ?? "",
+    lastName: employeePermission ? "" : user?.family_name ?? "",
     checkInDate: today,
     checkOutDate: tomorrow,
     numAdults: 1,
@@ -143,22 +151,25 @@ export function SuiteBookingForm() {
         <form onSubmit={form.handleSubmit(submitForm)} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <InputWithLabel<SuiteBookingSchemaType>
-              fieldTitle="Customer Email"
+              fieldTitle="Email"
               nameInSchema="customerEmail"
               type="email"
               placeholder="customer@example.com"
+              disabled={!employeePermission}
             />
 
             <InputWithLabel<SuiteBookingSchemaType>
               fieldTitle="First Name"
               nameInSchema="firstName"
               placeholder="Enter first name"
+              disabled={!employeePermission}
             />
 
             <InputWithLabel<SuiteBookingSchemaType>
               fieldTitle="Last Name"
               nameInSchema="lastName"
               placeholder="Enter last name"
+              disabled={!employeePermission}
             />
 
             <InputWithLabel<SuiteBookingSchemaType>

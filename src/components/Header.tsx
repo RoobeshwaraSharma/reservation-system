@@ -1,4 +1,4 @@
-import { HomeIcon, File, LogOut, CheckCircle, MenuIcon } from "lucide-react";
+import { HomeIcon, LogOut, CheckCircle, MenuIcon, Book } from "lucide-react";
 import Link from "next/link";
 import { LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components";
 import { Button } from "@/components/ui/button";
@@ -32,20 +32,29 @@ export function Header({ isCustomer, isManager }: Props) {
         </div>
         <div className="flex items-center">
           {!isCustomer && (
-            <NavButton
-              href="/cico"
-              label="Check In/Check Out"
+            <NavButtonMenu
               icon={CheckCircle}
+              label="Check In/Check Out"
+              choices={[{ title: "Check In/Check Out", href: "/cico" }]}
             />
           )}
           {isCustomer && (
             <NavButtonMenu
-              icon={File}
+              icon={Book}
               label="Customers Menu"
               choices={[
-                { title: "Search Reservations", href: "/reservations" },
-                { title: "New Reservation", href: "/reservations/form" },
-                { title: "Suite Management", href: "/suites" },
+                { title: "Reservations", href: "/reservations" },
+                { title: "Travel Company Booking", href: "/travel-company" },
+              ]}
+            />
+          )}
+          {!isCustomer && (
+            <NavButtonMenu
+              icon={Book}
+              label="Hotel Menu"
+              choices={[
+                { title: "Reservations", href: "/reservations" },
+                { title: "Suite Booking", href: "/suites" },
                 { title: "Travel Company Booking", href: "/travel-company" },
               ]}
             />
@@ -56,10 +65,8 @@ export function Header({ isCustomer, isManager }: Props) {
               icon={MenuIcon}
               label="Hotel Menu"
               choices={[
-                { title: "Search Rooms", href: "/rooms" },
-                { title: "Search Services", href: "/services" },
-                { title: "Suite Management", href: "/suites" },
-                { title: "Travel Company Booking", href: "/travel-company" },
+                { title: "Rooms", href: "/rooms" },
+                { title: "Services", href: "/services" },
                 ...(isManager ? [{ title: "Reports", href: "/reports" }] : []),
               ]}
             />

@@ -2,6 +2,7 @@ import { Backbutton } from "@/components/BackButton";
 import ReservationForm from "./ReservationForm";
 import { getReservation } from "@/lib/quaries/getReservation";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
+import { redirect } from "next/navigation";
 
 export async function generateMetadata({
   searchParams,
@@ -27,12 +28,23 @@ export default async function ReservationFormPage({
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
   const { reservationId } = await searchParams;
-  const { getUser } = getKindeServerSession();
+  const { getUser, getPermission } = getKindeServerSession();
   const user = await getUser();
+  const employeePermission = await getPermission("employee");
+
+  if (!user) {
+    redirect("/");
+  }
 
   // New reservation
   if (!reservationId) {
-    return <ReservationForm isEditable={true} user={user} />;
+    return (
+      <ReservationForm
+        isEditable={true}
+        user={user}
+        employeePermission={employeePermission?.isGranted ?? false}
+      />
+    );
   }
 
   // Edit reservation
@@ -51,8 +63,10 @@ export default async function ReservationFormPage({
 
     return (
       <ReservationForm
-        reservation={reservation}
-        isEditable={reservation.status === "Active"}
+        reservation={reservation.reservations}
+        isEditable={reservation.reservations.status === "Active"}
+        employeePermission={employeePermission?.isGranted ?? false}
+        isPayOnline={reservation.bill?.status !== "Payment Paid"}
       />
     );
   }

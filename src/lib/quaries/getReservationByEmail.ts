@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { reservations } from "@/db/schema";
+import { reservations, bill } from "@/db/schema";
 import { eq, asc } from "drizzle-orm";
 
 export async function getReservationByEmail(email: string) {
@@ -13,8 +13,11 @@ export async function getReservationByEmail(email: string) {
       checkOutDate: reservations.checkOutDate,
       status: reservations.status,
       createdBy: reservations.createdBy,
+      billTotalAmount: bill.totalAmount,
+      billStatus: bill.status,
     })
     .from(reservations)
+    .leftJoin(bill, eq(reservations.id, bill.reservationId))
     .where(eq(reservations.customerEmail, email))
     .orderBy(asc(reservations.checkInDate));
 

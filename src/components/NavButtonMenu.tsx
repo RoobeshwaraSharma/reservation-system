@@ -30,7 +30,9 @@ export function NavButtonMenu({ icon: Icon, label, choices }: Props) {
       <DropdownMenuContent align="end">
         {choices.map((choice) => (
           <DropdownMenuItem key={choice.title} asChild>
-            <Link href={choice.href}>{choice.title}</Link>
+            <Link href={choice.href} className="cursor-pointer">
+              {choice.title}
+            </Link>
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

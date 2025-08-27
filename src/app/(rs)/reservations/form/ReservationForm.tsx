@@ -6,6 +6,7 @@ import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 
 import { InputWithLabel } from "@/components/inputs/InputWithLabel";
+import { DateInputWithLabel } from "@/components/inputs/DateInputWithLabel";
 import { SelectWithLabel } from "@/components/inputs/SelectWithLabel";
 import { DisplayServerActionResponse } from "@/components/DisplayServerActionResponse";
 
@@ -43,6 +44,8 @@ type Props = {
   isEditable?: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   user?: KindeUser<Record<string, any>>;
+  employeePermission: boolean;
+  isPayOnline?: boolean;
 };
 
 const statusOptions = [
@@ -65,6 +68,8 @@ export default function ReservationForm({
   reservation,
   isEditable = true,
   user,
+  employeePermission,
+  isPayOnline = false,
 }: Props) {
   const router = useRouter();
   const today = new Date();
@@ -75,15 +80,23 @@ export default function ReservationForm({
 
   const defaultValues: insertReservationSchemaType = {
     id: reservation?.id ?? "(New)",
-    customerEmail: reservation?.customerEmail ?? user?.email ?? "",
-    firstName: reservation?.firstName ?? user?.given_name ?? "",
-    lastName: reservation?.lastName ?? user?.family_name ?? "",
+    customerEmail:
+      reservation?.customerEmail ??
+      (employeePermission ? "" : user?.email ?? ""),
+    firstName:
+      reservation?.firstName ??
+      (employeePermission ? "" : user?.given_name ?? ""),
+    lastName:
+      reservation?.lastName ??
+      (employeePermission ? "" : user?.family_name ?? ""),
     numAdults: reservation?.numAdults ?? 1,
     numChildren: reservation?.numChildren ?? 0,
     checkInDate: reservation?.checkInDate ?? today,
     checkOutDate: reservation?.checkOutDate ?? tomorrow,
     status: (reservation?.status as ReservationStatus) ?? "Active",
-    createdBy: (reservation?.createdBy as CreatedBy) ?? "Customer",
+    createdBy:
+      (reservation?.createdBy as CreatedBy) ??
+      (employeePermission ? "Clerk" : "Customer"),
   };
   const form = useForm<insertReservationSchemaType>({
     mode: "onBlur",
@@ -210,14 +223,14 @@ export default function ReservationForm({
               disabled={!isEditable}
             />
 
-            <InputWithLabel<insertReservationSchemaType>
+            <DateInputWithLabel<insertReservationSchemaType>
               fieldTitle="Check-in Date"
               nameInSchema="checkInDate"
               type="date"
               disabled={!isEditable}
             />
 
-            <InputWithLabel<insertReservationSchemaType>
+            <DateInputWithLabel<insertReservationSchemaType>
               fieldTitle="Check-out Date"
               nameInSchema="checkOutDate"
               type="date"
@@ -283,7 +296,7 @@ export default function ReservationForm({
                 )}
               </div>
             ) : null}
-            {reservation?.id && (
+            {reservation?.id && isPayOnline && (
               <Button
                 className="mt-4"
                 type="button"
