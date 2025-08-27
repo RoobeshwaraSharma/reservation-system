@@ -7,6 +7,11 @@ export default async function SuitesPage() {
   const { getUser, getPermission } = getKindeServerSession();
   const user = await getUser();
   const employeePermission = await getPermission("employee");
+  const managerPermission = await getPermission("manager");
+
+  // Managers should have all employee permissions plus additional features
+  const hasEmployeeAccess =
+    employeePermission?.isGranted || managerPermission?.isGranted;
 
   if (!user) {
     redirect("/");
@@ -24,7 +29,7 @@ export default async function SuitesPage() {
       <div className="grid gap-8 lg:grid-cols-2">
         <SuiteBookingForm
           user={user}
-          employeePermission={employeePermission?.isGranted ?? false}
+          employeePermission={hasEmployeeAccess ?? false}
         />
         <SuiteAvailability />
       </div>

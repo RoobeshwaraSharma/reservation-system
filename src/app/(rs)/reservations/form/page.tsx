@@ -31,6 +31,11 @@ export default async function ReservationFormPage({
   const { getUser, getPermission } = getKindeServerSession();
   const user = await getUser();
   const employeePermission = await getPermission("employee");
+  const managerPermission = await getPermission("manager");
+
+  // Managers should have all employee permissions plus additional features
+  const hasEmployeeAccess =
+    employeePermission?.isGranted || managerPermission?.isGranted;
 
   if (!user) {
     redirect("/");
@@ -42,7 +47,7 @@ export default async function ReservationFormPage({
       <ReservationForm
         isEditable={true}
         user={user}
-        employeePermission={employeePermission?.isGranted ?? false}
+        employeePermission={hasEmployeeAccess ?? false}
       />
     );
   }
@@ -65,7 +70,7 @@ export default async function ReservationFormPage({
       <ReservationForm
         reservation={reservation.reservations}
         isEditable={reservation.reservations.status === "Active"}
-        employeePermission={employeePermission?.isGranted ?? false}
+        employeePermission={hasEmployeeAccess ?? false}
         isPayOnline={reservation.bill?.status !== "Payment Paid"}
       />
     );

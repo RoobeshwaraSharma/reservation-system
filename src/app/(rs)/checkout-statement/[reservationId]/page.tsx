@@ -10,8 +10,13 @@ export default async function CheckoutStatementPage({
   const { reservationId } = await params;
   const { getPermission } = getKindeServerSession();
   const employeePermission = await getPermission("employee");
+  const managerPermission = await getPermission("manager");
 
-  if (!employeePermission?.isGranted) {
+  // Managers should have all employee permissions plus additional features
+  const hasEmployeeAccess =
+    employeePermission?.isGranted || managerPermission?.isGranted;
+
+  if (!hasEmployeeAccess) {
     redirect("/");
   }
 

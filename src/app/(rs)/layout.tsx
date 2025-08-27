@@ -13,9 +13,12 @@ export default async function RSLayout({
   const isEmployee = employeePermission?.isGranted;
   const isManager = managerPermission?.isGranted;
 
+  // Managers should have all employee permissions plus additional features
+  const hasEmployeeAccess = isEmployee || isManager;
+
   return (
     <div className="mx-auto w-full max-w-7xl">
-      <Header isCustomer={!isEmployee} isManager={isManager} />
+      <Header isCustomer={!hasEmployeeAccess} isManager={isManager} />
       <div className="px-4 py-2">{children}</div>
     </div>
   );

@@ -46,6 +46,18 @@ export default async function CheckInOutRservation({
   }
 
   const reservation = await getReservation(parseInt(reservationId));
+
+  if (!reservation) {
+    return (
+      <>
+        <h2 className="text-2xl mb-2">
+          Reservation ID #{reservationId} not found
+        </h2>
+        <Backbutton title="Go Back" variant="default" />
+      </>
+    );
+  }
+
   const reservedRooms = await getRoomsForReservation(parseInt(reservationId));
   const reservedServices = await getServicesForReservation(
     parseInt(reservationId)
@@ -55,7 +67,7 @@ export default async function CheckInOutRservation({
   return (
     <>
       <ReservationRoomDetails
-        reservation={reservation}
+        reservation={reservation.reservations}
         roomCount={reservedRooms.length}
       />
       <div className="mt-4 text-center">

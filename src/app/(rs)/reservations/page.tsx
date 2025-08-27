@@ -18,13 +18,16 @@ export default async function Tickets({
   const { getUser, getPermission } = getKindeServerSession();
 
   const employeePermission = await getPermission("employee");
+  const managerPermission = await getPermission("manager");
 
   const customerEmail = (await getUser()).email;
 
-  const isEmployee = employeePermission?.isGranted;
+  // Managers should have all employee permissions plus additional features
+  const hasEmployeeAccess =
+    employeePermission?.isGranted || managerPermission?.isGranted;
 
-  // If employee, show all reservations regardless of search
-  if (isEmployee) {
+  // If employee or manager, show all reservations regardless of search
+  if (hasEmployeeAccess) {
     const results = await getReservations();
     return (
       <>
