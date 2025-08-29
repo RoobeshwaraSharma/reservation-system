@@ -18,11 +18,12 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | Hotel Reservation",
-    default: "Hotel Reservation",
+    template: "%s | Serenity Hotel",
+    default: "Serenity Hotel - Luxury Accommodation in Dehiwala",
   },
-  description: "Roobesh's Hotel Reservation",
-  applicationName: "Hotel",
+  description:
+    "Experience luxury and comfort at Serenity Hotel in Dehiwala, Sri Lanka. Book your stay with our modern reservation system.",
+  applicationName: "Serenity Hotel",
 };
 
 export default function RootLayout({
